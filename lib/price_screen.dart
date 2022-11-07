@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -9,24 +10,45 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-
-  List getDropDownItems() {
-    List<DropdownMenuItem<String>> result = [];
+  DropdownButton<String> showAndroidDropdown() {
+    List<DropdownMenuItem<String>> menuItems = [];
     for (String i in currenciesList) {
-      result.add(DropdownMenuItem(
+      menuItems.add(DropdownMenuItem(
         child: Text(i),
         value: i,
       ));
     }
-    return result;
+
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: menuItems,
+      onChanged: (value) {
+        setState(() {
+          selectedCurrency = value;
+        });
+        print(value);
+      },
+    );
   }
 
-  List<Text> getCupertinoPickerItems() {
-    List<Text> result = [];
+  CupertinoPicker showIOSPicker() {
+    List<Text> pickerItems = [];
     for (String i in currenciesList) {
-      result.add(Text(i));
+      pickerItems.add(Text(i));
     }
-    return result;
+    return CupertinoPicker(
+      magnification: 1.22,
+      squeeze: 1.2,
+      useMagnifier: false,
+      itemExtent: 32,
+      // This is called when selected item is changed.
+      onSelectedItemChanged: (int selectedItem) {
+        setState(() {
+          print(selectedItem);
+        });
+      },
+      children: pickerItems,
+    );
   }
 
   @override
@@ -66,19 +88,7 @@ class _PriceScreenState extends State<PriceScreen> {
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
             child: Center(
-              child: CupertinoPicker(
-                // magnification: 1.22,
-                // squeeze: 1.2,
-                // useMagnifier: false,
-                itemExtent: 32,
-                // This is called when selected item is changed.
-                onSelectedItemChanged: (int selectedItem) {
-                  setState(() {
-                    print(selectedItem);
-                  });
-                },
-                children: getCupertinoPickerItems(),
-              ),
+              child: Platform.isIOS ? showIOSPicker() : showAndroidDropdown(),
             ),
           ),
         ],
@@ -86,13 +96,3 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
-// DropdownButton<String>(
-// value: selectedCurrency,
-// items: getDropDownItems(),
-// onChanged: (value) {
-// setState(() {
-// selectedCurrency = value;
-// });
-// print(value);
-// },
-// )
