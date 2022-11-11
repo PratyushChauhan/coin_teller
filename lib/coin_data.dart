@@ -41,7 +41,7 @@ class CoinData {
     if (response.statusCode == 200) {
       String data = response.body;
       dynamic decodedData = jsonDecode(data);
-      print(data);
+      // print(data);
       return decodedData['rate'];
     } else {
       throw ('error: Code ${response.statusCode}');

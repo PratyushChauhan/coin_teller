@@ -12,29 +12,34 @@ class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
   CoinData priceGetter = CoinData();
 
-  dynamic getPrice() {
+  dynamic getPrice(String crypto) {
     return FutureBuilder(
-      future: priceGetter.getCryptoPrice('BTC', selectedCurrency),
+      future: priceGetter.getCryptoPrice(crypto, selectedCurrency),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          double price = (snapshot.data * 100).round() / 100;
-          return Text(
-            '1 BTC = ${price} $selectedCurrency',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-            ),
-          );
-        } else {
-          return Text(
-            '1 BTC = ? $selectedCurrency',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-            ),
-          );
+        try {
+          if (snapshot.connectionState == ConnectionState.done) {
+            double price = (snapshot.data * 100).round() / 100;
+            return Text(
+              '1 $crypto = ${price} $selectedCurrency',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20.0,
+                color: Colors.white,
+              ),
+            );
+          } else {
+            return Text(
+              '1 BTC = ? $selectedCurrency',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20.0,
+                color: Colors.white,
+              ),
+            );
+          }
+        } catch (e) {
+          print(e);
+          return Text('ERROR : Check your connection');
         }
       },
     );
@@ -91,19 +96,13 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: getPrice(),
-              ),
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              buildPriceCard('BTC'),
+              buildPriceCard('ETH'),
+              buildPriceCard('LTC'),
+            ],
           ),
           Container(
             height: 150.0,
@@ -115,6 +114,23 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Padding buildPriceCard(String crypto) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: getPrice(crypto),
+        ),
       ),
     );
   }
